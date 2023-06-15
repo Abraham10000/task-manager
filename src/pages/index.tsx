@@ -7,11 +7,41 @@ import { useRouter } from "next/router";
   @param {Date} clientTime - The client time.
   @returns {string} The time difference in the format "{days} days, {hours} hours, {minutes} minutes, {seconds} seconds".
 */
-const calculateTimeDifference = (server: Date, client: Date) => {};
+const calculateTimeDifference = (serverTime: Date, clientTime: Date) : string => {
+  const difference = serverTime.getTime() - clientTime.getTime();
+
+  const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((difference / (1000 * 60)) % 60);
+  const seconds = Math.floor((difference / 1000) % 60);
+
+  return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+};
+
+export async function getServerSideProps() {
+  const serverTime = new Date();
+  const clientTime = new Date();
+  const timeDifference = calculateTimeDifference(serverTime, clientTime);
+
+  return {
+    props: {
+      serverTime: serverTime.toString(),
+      timeDifference,
+    },
+  };
+}
+
+interface HomeProps {
+  serverTime: string;
+  timeDifference: string;
+}
 
 
-export default function Home() {
+export default function Home({serverTime, timeDifference} : HomeProps) {
   const router = useRouter();
+   const clientTime = new Date();
+
+
   const moveToTaskManager = () => {
     router.push("/tasks");
   }
@@ -29,13 +59,13 @@ export default function Home() {
           {/* Display here the server time (DD-MM-AAAA HH:mm)*/}
           <p>
             Server time:{" "}
-            <span className="serverTime">{/* Replace with the value */}</span>
+            <span className="serverTime">{serverTime}</span>
           </p>
 
           {/* Display here the time difference between the server side and the client side */}
           <p>
             Time diff:{" "}
-            <span className="serverTime">{/* Replace with the value */}</span>
+            <span className="serverTime">{timeDifference}</span>
           </p>
         </div>
 
