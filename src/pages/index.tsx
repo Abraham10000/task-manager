@@ -7,6 +7,8 @@ import { useRouter } from "next/router";
   @param {Date} clientTime - The client time.
   @returns {string} The time difference in the format "{days} days, {hours} hours, {minutes} minutes, {seconds} seconds".
 */
+
+/** This is for the calcul of difference between client and server time */
 const calculateTimeDifference = (serverTime: Date, clientTime: Date) : string => {
   const difference = serverTime.getTime() - clientTime.getTime();
 
@@ -16,8 +18,9 @@ const calculateTimeDifference = (serverTime: Date, clientTime: Date) : string =>
   const seconds = Math.floor((difference / 1000) % 60);
 
   return `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
-};
+}; 
 
+// If we want to concordate the result in client and server side, we must do the calcul in the server side
 export async function getServerSideProps() {
   const serverTime = new Date();
   const clientTime = new Date();
@@ -31,6 +34,7 @@ export async function getServerSideProps() {
   };
 }
 
+// For define the necessary props
 interface HomeProps {
   serverTime: string;
   timeDifference: string;
