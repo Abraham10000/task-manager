@@ -1,3 +1,4 @@
+import useLocalStorage from '@/hooks/useLocalStorage';
 import { useTaskManager } from '@/store/useTaskManager';
 import React, { ChangeEvent, useRef, useEffect, useState } from 'react';
 
@@ -17,6 +18,21 @@ const TaskManager = () => {
     deleteTask,
   } = useTaskManager();
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [storedTasks, setStoredTasks] = useLocalStorage('tasks', []);
+  
+  useEffect(() => {
+    if (storedTasks.length > 0 && tasks.length === 0) {
+      // Add the tasks in the local storage only handler is empty
+      storedTasks.forEach((task : Task) => addTask(task));
+    }
+  }, [storedTasks, tasks, addTask]);
+
+  useEffect(() => {
+    // Update the tasks in the local storage at every changement
+    setStoredTasks(tasks);
+  }, [tasks, setStoredTasks]);
+
   const handleAddTask = () => {
     const title = createTaskRef.current?.value || '';
     const newTask: Task = {
@@ -35,9 +51,6 @@ const TaskManager = () => {
   const handleDeleteTask = (taskId: number) => {
     deleteTask(taskId);
   };
-  
-  const [searchQuery, setSearchQuery] = useState('');
-
 
   const handleSearch = (e : any) => {
     searchTask(e.target.value);
